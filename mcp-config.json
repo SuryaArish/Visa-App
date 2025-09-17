@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "visa-api": {
+      "command": "node",
+      "args": ["server.js"],
+      "cwd": "./mcp-server"
+    }
+  }
+}

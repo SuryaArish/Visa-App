@@ -1,0 +1,2 @@
+for<'b, 'a> fn(&'b str, Arc<utoipa_swagger_ui::Config<'a>>) -> Result<std::option::Option<SwaggerFile<'a>>, Box<(dyn StdError + 'static)>> {utoipa_swagger_ui::serve}
+for<'a, 'a> fn(&'a str, Arc<utoipa_swagger_ui::Config<'a>>) -> Result<std::option::Option<SwaggerFile<'a>>, Box<(dyn StdError + 'static)>> {utoipa_swagger_ui::serve}: Handler<_, _>

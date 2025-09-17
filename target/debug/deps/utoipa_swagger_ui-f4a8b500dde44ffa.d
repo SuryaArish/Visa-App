@@ -1,0 +1,11 @@
+C:\visa app\target\debug\deps\utoipa_swagger_ui-f4a8b500dde44ffa.d: C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\lib.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\actix.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\axum.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\oauth.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\rocket.rs
+
+C:\visa app\target\debug\deps\libutoipa_swagger_ui-f4a8b500dde44ffa.rlib: C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\lib.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\actix.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\axum.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\oauth.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\rocket.rs
+
+C:\visa app\target\debug\deps\libutoipa_swagger_ui-f4a8b500dde44ffa.rmeta: C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\lib.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\actix.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\axum.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\oauth.rs C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\rocket.rs
+
+C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\lib.rs:
+C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\actix.rs:
+C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\axum.rs:
+C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\oauth.rs:
+C:\Users\LENOVO\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\utoipa-swagger-ui-4.0.0\src\rocket.rs:

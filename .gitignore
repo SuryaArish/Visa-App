@@ -1,0 +1,23 @@
+# Rust build
+/target/
+**/*.rs.bk
+
+# Dependencies
+Cargo.lock
+
+# Environment files
+.env
+
+# VSCode settings
+.vscode/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# MCP config (if you don’t want to commit local config)
+mcp-config.json
+
+# SQLx metadata (optional, ignore if generated)
+sqlx-data.json
