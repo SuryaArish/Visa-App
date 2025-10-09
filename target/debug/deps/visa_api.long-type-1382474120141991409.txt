@@ -1,1 +1,0 @@
-SwaggerUi: tower_service::Service<axum::http::Request<Body>>

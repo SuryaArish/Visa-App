@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  visa-api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres.wnvviathstqscskifolf:VisaDetail%402025@aws-1-ap-south-1.pooler.supabase.com:6543/postgres
+    restart: unless-stopped
