@@ -1,1 +1,1 @@
-E:\Visa-App(git)\visa-app\target\debug\visa-api.exe: E:\Visa-App(git)\visa-app\src\handlers.rs E:\Visa-App(git)\visa-app\src\main.rs E:\Visa-App(git)\visa-app\src\models.rs
+E:\Visa-App(git)\visa-app\target\debug\visa-api.exe: E:\Visa-App(git)\visa-app\src\config\database.rs E:\Visa-App(git)\visa-app\src\config\mod.rs E:\Visa-App(git)\visa-app\src\handlers.rs E:\Visa-App(git)\visa-app\src\main.rs E:\Visa-App(git)\visa-app\src\middleware\mod.rs E:\Visa-App(git)\visa-app\src\middleware\request_logging.rs E:\Visa-App(git)\visa-app\src\models.rs

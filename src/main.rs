@@ -1,43 +1,54 @@
-mod models;
-mod handlers;
-
 use axum::{
-    routing::{delete, get, post},
+    http::Method,
+    routing::{get, post, put, delete, patch},
     Router,
 };
-use sqlx::postgres::PgPoolOptions;
-use tower_http::cors::CorsLayer;
+use tower_http::cors::{Any, CorsLayer};
+
+mod models;
+mod handlers;
+mod middleware;
+mod config;
+
 use handlers::*;
+use config::database::{initialize_database, get_db_pool};
+
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    let database_url = std::env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "postgresql://postgres.wnvviathstqscskifolf:VisaDetail%402025@aws-1-ap-south-1.pooler.supabase.com:6543/postgres".to_string());
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&database_url)
-        .await?;
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    run_local_server().await?;
+    Ok(())
+}
+
+async fn run_local_server() -> Result<(), Box<dyn std::error::Error>> {
+    // Initialize database connection
+    initialize_database().await?;
+    let pool = get_db_pool();
+
+    let cors = CorsLayer::new()
+        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE, Method::PATCH, Method::OPTIONS])
+        .allow_origin(Any)
+        .allow_headers(vec![
+            axum::http::header::AUTHORIZATION,
+            axum::http::header::CONTENT_TYPE,
+        ]);
 
     let app = Router::new()
-        // GET endpoints
+        // Health and Info Routes
+        .route("/health", get(health_check))
+        .route("/hello", get(test_connection))
+        
+        // Visa Management APIs
         .route("/customers", get(get_all_customers))
-        .route("/customers/:email", get(get_customer_by_email))
-        // DELETE endpoints
-        .route("/customers/:email", delete(delete_customer))
-        // POST endpoints
-        .route("/create_h1bcustomer", post(create_complete_customer))
-        .route("/customer/personal", post(create_personal))
-        .route("/customer/:email/address", post(update_address))
-        .route("/customer/:email/h1b", post(update_h1b))
-        // Test endpoint
-        .route("/test", get(test_connection))
-        // .merge(swagger_router)
-        .with_state(pool)
-        .layer(CorsLayer::permissive());
+        .route("/create_visa_details", post(create_visa_details))
+        .route("/delete_visa_details/:email", delete(delete_visa_details))
+        .route("/update_visa_details/:email", put(update_visa_details))
+        .route("/soft_delete_customer/:email", patch(soft_delete_customer))
+        .route("/get_all_active_customers", get(get_all_h1b_customers))
+        .layer(cors);
 
+    println!("Starting local server on http://localhost:3000");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
-    println!("Server running on http://localhost:3000");
-    println!("Swagger UI available at http://localhost:3000/swagger-ui");
-
     axum::serve(listener, app).await?;
+
     Ok(())
 }
