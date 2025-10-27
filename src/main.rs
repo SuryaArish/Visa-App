@@ -10,6 +10,8 @@ mod handlers;
 mod middleware;
 mod config;
 
+
+
 use handlers::*;
 use config::database::{initialize_database, get_db_pool};
 
@@ -37,13 +39,27 @@ async fn run_local_server() -> Result<(), Box<dyn std::error::Error>> {
         .route("/health", get(health_check))
         .route("/hello", get(test_connection))
         
-        // Visa Management APIs
-        .route("/customers", get(get_all_customers))
+        // Original Visa Management APIs (keeping for backward compatibility)
+        // .route("/customers", get(get_all_customers))
+
         .route("/create_visa_details", post(create_visa_details))
         .route("/delete_visa_details/:email", delete(delete_visa_details))
         .route("/update_visa_details/:email", put(update_visa_details))
-        .route("/soft_delete_customer/:email", patch(soft_delete_customer))
+        // .route("/soft_delete_customer_via_email/:email", patch(soft_delete_customer))
         .route("/get_all_active_customers", get(get_all_h1b_customers))
+        
+        // New API structure as per README
+        .route("/h1b_customer/create", post(create_visa_details))
+        .route("/customers", get(get_all_customers))
+        .route("/get_customer_by_id/:id", get(get_customer_by_id))
+        .route("/get_customer_by_email/:email", get(get_customer_by_email))
+        .route("/soft_delete_customer_via_id/:id", patch(soft_delete_customer_by_id))
+        .route("/update_customer_by_id/:id", put(update_customer_by_id))
+
+        //
+        
+        .route("/h1b_customer/:id/address", put(update_customer_address))
+        .route("/update_customer/:id", put(update_customer_h1b))
         .layer(cors);
 
     println!("Starting local server on http://localhost:3000");

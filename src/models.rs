@@ -3,6 +3,7 @@ use sqlx::FromRow;
 use chrono::NaiveDate;
 use utoipa::ToSchema;
 use rust_decimal::Decimal;
+use uuid::Uuid;
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct CreateCompleteCustomerRequest {
@@ -36,6 +37,7 @@ pub struct CreateCompleteCustomerRequest {
 
 #[derive(Debug, FromRow, Serialize, ToSchema)]
 pub struct CreateCustomer {
+    pub customer_id: Uuid,
     pub email: String,
     pub first_name: String,
     pub last_name: String,

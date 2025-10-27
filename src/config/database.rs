@@ -4,11 +4,11 @@ use std::sync::OnceLock;
 static DB_POOL: OnceLock<PgPool> = OnceLock::new();
 
 pub async fn initialize_database() -> Result<(), Box<dyn std::error::Error>> {
-    let database_url = "postgresql://postgres.wnvviathstqscskifolf:Visa_App@2025@aws-1-ap-south-1.pooler.supabase.com:6543/postgres?prepared_statement_cache_queries=false&statement_cache_capacity=0";
+    let database_url = "postgresql://postgres.wnvviathstqscskifolf:Visa_App@2025@aws-1-ap-south-1.pooler.supabase.com:6543/postgres?prepared_statement_cache_queries=false";
                                         
     
     let pool = PgPoolOptions::new()
-        .max_connections(5)
+        .max_connections(1)
         .connect(database_url)
         .await?;
     
