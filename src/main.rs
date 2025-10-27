@@ -43,10 +43,9 @@ async fn run_local_server() -> Result<(), Box<dyn std::error::Error>> {
         // .route("/customers", get(get_all_customers))
 
         .route("/create_visa_details", post(create_visa_details))
-        .route("/delete_visa_details/:email", delete(delete_visa_details))
-        .route("/update_visa_details/:email", put(update_visa_details))
+
         // .route("/soft_delete_customer_via_email/:email", patch(soft_delete_customer))
-        .route("/get_all_active_customers", get(get_all_h1b_customers))
+
         
         // New API structure as per README
         .route("/h1b_customer/create", post(create_visa_details))
