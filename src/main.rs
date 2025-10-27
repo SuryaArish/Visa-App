@@ -41,12 +41,11 @@ async fn run_local_server() -> Result<(), Box<dyn std::error::Error>> {
         
         // New API structure as per README
         .route("/h1b_customer/create", post(create_visa_details))
-        .route("/customers", get(get_all_customers))
+        .route("/customers", get(get_all_customers_with_status))
         .route("/get_customer_by_id/:id", get(get_customer_by_id))
         .route("/get_customer_by_email/:email", get(get_customer_by_email))
         .route("/soft_delete_customer_via_id/:id", patch(soft_delete_customer_by_id))
         .route("/update_customer_by_id/:id", put(update_customer_by_id))
-        .route("/get_all_customers", get(get_all_customers_with_status))
 
 
         //

@@ -741,7 +741,7 @@ pub async fn get_all_customers_with_status() -> Result<Json<Vec<serde_json::Valu
         street_name, city, state, zip,
         client_name, client_street_name, client_city, client_state, client_zip,
         lca_title, lca_salary, lca_code, receipt_number, h1b_start_date, h1b_end_date, h1b_status::text
-        FROM visa_db.h1bcustomer -- {}", timestamp);
+        FROM visa_db.h1bcustomer WHERE h1b_status = 'Active' -- {}", timestamp);
     
     let rows = pool.fetch_all(raw_sql.as_str())
     .await
