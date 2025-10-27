@@ -731,3 +731,57 @@ pub async fn update_customer_by_id(
         }
     }
 }
+pub async fn get_all_customers_with_status() -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
+    println!("🔥 get_all_customers_with_status function called");
+    let pool = get_db_pool();
+    
+    let timestamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
+    let raw_sql = format!("SELECT customer_id, email, first_name, last_name, dob, sex::text, marital_status::text, phone, 
+        emergency_contact_name, emergency_contact_phone, employment_start_date,
+        street_name, city, state, zip,
+        client_name, client_street_name, client_city, client_state, client_zip,
+        lca_title, lca_salary, lca_code, receipt_number, h1b_start_date, h1b_end_date, h1b_status::text
+        FROM visa_db.h1bcustomer -- {}", timestamp);
+    
+    let rows = pool.fetch_all(raw_sql.as_str())
+    .await
+    .map_err(|e| {
+        eprintln!("❌ Database error in get_all_customers_with_status: {}", e);
+        eprintln!("❌ Error details: {:?}", e);
+        eprintln!("❌ SQL Query: {}", raw_sql);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+    let customers: Vec<serde_json::Value> = rows.into_iter().map(|row| {
+        let mut response = serde_json::Map::new();
+        response.insert("email".to_string(), serde_json::json!(row.get::<String, _>("email")));
+        response.insert("first_name".to_string(), serde_json::json!(row.get::<String, _>("first_name")));
+        response.insert("last_name".to_string(), serde_json::json!(row.get::<String, _>("last_name")));
+        response.insert("dob".to_string(), serde_json::json!(row.get::<chrono::NaiveDate, _>("dob")));
+        response.insert("sex".to_string(), serde_json::json!(row.get::<String, _>("sex")));
+        response.insert("marital_status".to_string(), serde_json::json!(row.get::<String, _>("marital_status")));
+        response.insert("phone".to_string(), serde_json::json!(row.get::<String, _>("phone")));
+        response.insert("emergency_contact_name".to_string(), serde_json::json!(row.get::<String, _>("emergency_contact_name")));
+        response.insert("emergency_contact_phone".to_string(), serde_json::json!(row.get::<String, _>("emergency_contact_phone")));
+        response.insert("employment_start_date".to_string(), serde_json::json!(row.get::<chrono::NaiveDate, _>("employment_start_date")));
+        response.insert("street_name".to_string(), serde_json::json!(row.get::<String, _>("street_name")));
+        response.insert("city".to_string(), serde_json::json!(row.get::<String, _>("city")));
+        response.insert("state".to_string(), serde_json::json!(row.get::<String, _>("state")));
+        response.insert("zip".to_string(), serde_json::json!(row.get::<String, _>("zip")));
+        response.insert("client_name".to_string(), serde_json::json!(row.get::<String, _>("client_name")));
+        response.insert("client_street_name".to_string(), serde_json::json!(row.get::<String, _>("client_street_name")));
+        response.insert("client_city".to_string(), serde_json::json!(row.get::<String, _>("client_city")));
+        response.insert("client_state".to_string(), serde_json::json!(row.get::<String, _>("client_state")));
+        response.insert("client_zip".to_string(), serde_json::json!(row.get::<String, _>("client_zip")));
+        response.insert("lca_title".to_string(), serde_json::json!(row.get::<String, _>("lca_title")));
+        response.insert("lca_salary".to_string(), serde_json::json!(row.get::<rust_decimal::Decimal, _>("lca_salary")));
+        response.insert("lca_code".to_string(), serde_json::json!(row.get::<String, _>("lca_code")));
+        response.insert("receipt_number".to_string(), serde_json::json!(row.get::<String, _>("receipt_number")));
+        response.insert("h1b_start_date".to_string(), serde_json::json!(row.get::<chrono::NaiveDate, _>("h1b_start_date")));
+        response.insert("h1b_end_date".to_string(), serde_json::json!(row.get::<chrono::NaiveDate, _>("h1b_end_date")));
+        response.insert("h1b_status".to_string(), serde_json::json!(row.get::<String, _>("h1b_status")));
+        serde_json::Value::Object(response)
+    }).collect();
+
+    Ok(Json(customers))
+}

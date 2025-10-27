@@ -39,14 +39,6 @@ async fn run_local_server() -> Result<(), Box<dyn std::error::Error>> {
         .route("/health", get(health_check))
         .route("/hello", get(test_connection))
         
-        // Original Visa Management APIs (keeping for backward compatibility)
-        // .route("/customers", get(get_all_customers))
-
-        .route("/create_visa_details", post(create_visa_details))
-
-        // .route("/soft_delete_customer_via_email/:email", patch(soft_delete_customer))
-
-        
         // New API structure as per README
         .route("/h1b_customer/create", post(create_visa_details))
         .route("/customers", get(get_all_customers))
@@ -54,9 +46,13 @@ async fn run_local_server() -> Result<(), Box<dyn std::error::Error>> {
         .route("/get_customer_by_email/:email", get(get_customer_by_email))
         .route("/soft_delete_customer_via_id/:id", patch(soft_delete_customer_by_id))
         .route("/update_customer_by_id/:id", put(update_customer_by_id))
+        .route("/get_all_customers", get(get_all_customers_with_status))
+
 
         //
         
+
+
         .route("/h1b_customer/:id/address", put(update_customer_address))
         .route("/update_customer/:id", put(update_customer_h1b))
         .layer(cors);
