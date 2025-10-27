@@ -52,8 +52,7 @@ async fn run_local_server() -> Result<(), Box<dyn std::error::Error>> {
         
 
 
-        .route("/h1b_customer/:id/address", put(update_customer_address))
-        .route("/update_customer/:id", put(update_customer_h1b))
+
         .layer(cors);
 
     println!("Starting local server on http://localhost:3000");
