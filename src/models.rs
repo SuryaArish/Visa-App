@@ -8,6 +8,7 @@ use uuid::Uuid;
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct CreateCompleteCustomerRequest {
     pub email: String,
+    pub login_email: String,
     pub first_name: String,
     pub last_name: String,
     pub dob: NaiveDate,
