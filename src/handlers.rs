@@ -634,6 +634,28 @@ pub async fn soft_delete_customer_by_id(
     let pool = get_db_pool();
 
     let timestamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
+    let check_sql = format!("SELECT h1b_status::text FROM global_visa_mgmt.h1bcustomer WHERE customer_id = '{}'::uuid -- {}", customer_id.replace("'", "''"), timestamp);
+    
+    match pool.fetch_optional(check_sql.as_str()).await {
+        Ok(Some(row)) => {
+            let current_status: String = row.get("h1b_status");
+            if current_status == "Inactive" {
+                return Ok(Json(serde_json::json!({
+                    "message": "Data not found"
+                })));
+            }
+        },
+        Ok(None) => {
+            return Ok(Json(serde_json::json!({
+                "message": "Data not found"
+            })));
+        },
+        Err(e) => {
+            eprintln!("❌ Database error checking status: {}", e);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+        }
+    }
+
     let raw_sql = format!("UPDATE global_visa_mgmt.h1bcustomer SET h1b_status = 'Inactive' WHERE customer_id = '{}'::uuid -- {}", customer_id.replace("'", "''"), timestamp);
 
     match pool.execute(raw_sql.as_str()).await 
@@ -844,6 +866,176 @@ pub async fn get_customer_by_login_email(
             eprintln!("❌ Database error in get_customer_by_login_email: {}", e);
             eprintln!("❌ Error details: {:?}", e);
             eprintln!("❌ Login Email: {}", login_email);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+pub async fn get_all_customers_no_filter() -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
+    println!("🔥 get_all_customers_no_filter function called");
+    let pool = get_db_pool();
+    
+    let timestamp = get_timestamp();
+    let raw_sql = format!("SELECT customer_id, email, first_name, last_name, dob, sex::text, marital_status::text, phone, 
+        emergency_contact_name, emergency_contact_phone, employment_start_date,
+        street_name, city, state, zip,
+        client_name, client_street_name, client_city, client_state, client_zip,
+        lca_title, lca_salary, lca_code, receipt_number, h1b_start_date, h1b_end_date, login_email, h1b_status::text
+        FROM global_visa_mgmt.h1bcustomer -- {}", timestamp);
+    
+    let rows = pool.fetch_all(raw_sql.as_str())
+    .await
+    .map_err(|e| {
+        eprintln!("❌ Database error in get_all_customers_no_filter: {}", e);
+        eprintln!("❌ Error details: {:?}", e);
+        eprintln!("❌ SQL Query: {}", raw_sql);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+    let customers: Vec<serde_json::Value> = rows.into_iter().map(|row| {
+        serde_json::json!({
+            "customer_id": row.get::<uuid::Uuid, _>("customer_id"),
+            "email": row.get::<String, _>("email"),
+            "first_name": row.get::<String, _>("first_name"),
+            "last_name": row.get::<String, _>("last_name"),
+            "dob": row.get::<chrono::NaiveDate, _>("dob"),
+            "sex": row.get::<String, _>("sex"),
+            "marital_status": row.get::<String, _>("marital_status"),
+            "phone": row.get::<String, _>("phone"),
+            "emergency_contact_name": row.get::<String, _>("emergency_contact_name"),
+            "emergency_contact_phone": row.get::<String, _>("emergency_contact_phone"),
+            "employment_start_date": row.get::<chrono::NaiveDate, _>("employment_start_date"),
+            "street_name": row.get::<String, _>("street_name"),
+            "city": row.get::<String, _>("city"),
+            "state": row.get::<String, _>("state"),
+            "zip": row.get::<String, _>("zip"),
+            "client_name": row.get::<String, _>("client_name"),
+            "client_street_name": row.get::<String, _>("client_street_name"),
+            "client_city": row.get::<String, _>("client_city"),
+            "client_state": row.get::<String, _>("client_state"),
+            "client_zip": row.get::<String, _>("client_zip"),
+            "lca_title": row.get::<String, _>("lca_title"),
+            "lca_salary": row.get::<rust_decimal::Decimal, _>("lca_salary"),
+            "lca_code": row.get::<String, _>("lca_code"),
+            "receipt_number": row.get::<String, _>("receipt_number"),
+            "h1b_start_date": row.get::<chrono::NaiveDate, _>("h1b_start_date"),
+            "h1b_end_date": row.get::<chrono::NaiveDate, _>("h1b_end_date"),
+            "login_email": row.get::<String, _>("login_email"),
+            "h1b_status": row.get::<String, _>("h1b_status")
+        })
+    }).collect();
+
+    Ok(Json(customers))
+}
+
+pub async fn activate_customer_by_id(
+    Path(customer_id): Path<String>,
+) -> Result<Json<serde_json::Value>, StatusCode> {
+    println!("🔥 activate_customer_by_id function called for customer_id: {}", customer_id);
+    let pool = get_db_pool();
+
+    let timestamp = get_timestamp();
+    let check_sql = format!("SELECT h1b_status::text FROM global_visa_mgmt.h1bcustomer WHERE customer_id = '{}'::uuid -- {}", customer_id.replace("'", "''"), timestamp);
+    
+    match pool.fetch_optional(check_sql.as_str()).await {
+        Ok(Some(row)) => {
+            let current_status: String = row.get("h1b_status");
+            if current_status == "Active" {
+                return Ok(Json(serde_json::json!({
+                    "message": "This customer is already active."
+                })));
+            }
+        },
+        Ok(None) => {
+            return Ok(Json(serde_json::json!({
+                "status": 404,
+                "message": "Record not found in the database",
+                "customer_id": customer_id
+            })));
+        },
+        Err(e) => {
+            eprintln!("❌ Database error checking status: {}", e);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    let raw_sql = format!("UPDATE global_visa_mgmt.h1bcustomer SET h1b_status = 'Active' WHERE customer_id = '{}'::uuid -- {}", customer_id.replace("'", "''"), timestamp);
+
+    match pool.execute(raw_sql.as_str()).await {
+        Ok(result) => {
+            if result.rows_affected() == 0 {
+                Ok(Json(serde_json::json!({
+                    "status": 404,
+                    "message": "Record not found in the database",
+                    "customer_id": customer_id
+                })))
+            } else {
+                let select_sql = format!("SELECT customer_id, email, first_name, last_name, dob, sex::text, marital_status::text, phone, 
+                    emergency_contact_name, emergency_contact_phone, employment_start_date,
+                    street_name, city, state, zip,
+                    client_name, client_street_name, client_city, client_state, client_zip,
+                    lca_title, lca_salary, lca_code, receipt_number, h1b_start_date, h1b_end_date, login_email, h1b_status::text
+                    FROM global_visa_mgmt.h1bcustomer WHERE customer_id = '{}'::uuid -- {}", customer_id.replace("'", "''"), timestamp);
+                
+                match pool.fetch_optional(select_sql.as_str()).await {
+                    Ok(Some(row)) => {
+                        Ok(Json(serde_json::json!({
+                            "message": "Customer activated successfully",
+                            "customer_id": customer_id,
+                            "rows_affected": result.rows_affected(),
+                            "updated_record": {
+                                "customer_id": row.get::<uuid::Uuid, _>("customer_id"),
+                                "email": row.get::<String, _>("email"),
+                                "first_name": row.get::<String, _>("first_name"),
+                                "last_name": row.get::<String, _>("last_name"),
+                                "dob": row.get::<chrono::NaiveDate, _>("dob"),
+                                "sex": row.get::<String, _>("sex"),
+                                "marital_status": row.get::<String, _>("marital_status"),
+                                "phone": row.get::<String, _>("phone"),
+                                "emergency_contact_name": row.get::<String, _>("emergency_contact_name"),
+                                "emergency_contact_phone": row.get::<String, _>("emergency_contact_phone"),
+                                "employment_start_date": row.get::<chrono::NaiveDate, _>("employment_start_date"),
+                                "street_name": row.get::<String, _>("street_name"),
+                                "city": row.get::<String, _>("city"),
+                                "state": row.get::<String, _>("state"),
+                                "zip": row.get::<String, _>("zip"),
+                                "client_name": row.get::<String, _>("client_name"),
+                                "client_street_name": row.get::<String, _>("client_street_name"),
+                                "client_city": row.get::<String, _>("client_city"),
+                                "client_state": row.get::<String, _>("client_state"),
+                                "client_zip": row.get::<String, _>("client_zip"),
+                                "lca_title": row.get::<String, _>("lca_title"),
+                                "lca_salary": row.get::<rust_decimal::Decimal, _>("lca_salary"),
+                                "lca_code": row.get::<String, _>("lca_code"),
+                                "receipt_number": row.get::<String, _>("receipt_number"),
+                                "h1b_start_date": row.get::<chrono::NaiveDate, _>("h1b_start_date"),
+                                "h1b_end_date": row.get::<chrono::NaiveDate, _>("h1b_end_date"),
+                                "login_email": row.get::<String, _>("login_email"),
+                                "h1b_status": row.get::<String, _>("h1b_status")
+                            }
+                        })))
+                    },
+                    Ok(None) => {
+                        Ok(Json(serde_json::json!({
+                            "message": "Customer activated successfully",
+                            "customer_id": customer_id,
+                            "rows_affected": result.rows_affected()
+                        })))
+                    },
+                    Err(e) => {
+                        eprintln!("❌ Database error fetching updated record: {}", e);
+                        Ok(Json(serde_json::json!({
+                            "message": "Customer activated successfully",
+                            "customer_id": customer_id,
+                            "rows_affected": result.rows_affected()
+                        })))
+                    }
+                }
+            }
+        },
+        Err(e) => {
+            eprintln!("❌ Database error in activate_customer_by_id: {}", e);
+            eprintln!("❌ Error details: {:?}", e);
+            eprintln!("❌ Customer ID: {}", customer_id);
             Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
