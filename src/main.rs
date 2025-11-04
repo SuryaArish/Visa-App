@@ -17,6 +17,7 @@ use config::database::{initialize_database, get_db_pool};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    dotenv::dotenv().ok();
     run_local_server().await?;
     Ok(())
 }
