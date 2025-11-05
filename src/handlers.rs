@@ -817,7 +817,7 @@ pub async fn get_customer_by_login_email(
         street_name, city, state, zip,
         client_name, client_street_name, client_city, client_state, client_zip,
         lca_title, lca_salary, lca_code, receipt_number, h1b_start_date, h1b_end_date, login_email, h1b_status::text
-        FROM global_visa_mgmt.h1bcustomer WHERE login_email = '{}'", login_email.replace("'", "''"));
+        FROM global_visa_mgmt.h1bcustomer WHERE login_email = '{}' AND h1b_status = 'Active'", login_email.replace("'", "''"));
     
     match pool.fetch_all(raw_sql.as_str())
         .await {
